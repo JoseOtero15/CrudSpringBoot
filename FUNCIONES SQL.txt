@@ -1,0 +1,124 @@
+N_EJEMPLO
+
+create or replace NONEDITIONABLE function n_ejemplo(n_sales NUMBER)
+return varchar
+is
+n_commission NUMBER;
+Begin
+    CASE
+        WHEN n_sales > 200000 then
+            n_commission :=0.2;
+        WHEN n_sales >= 100000 and n_sales < 200000 then
+            n_commission :=0.15;
+        WHEN n_sales >= 50000 and n_sales < 100000 then
+            n_commission := 0.1;
+        WHEN n_sales >= 30000 Then
+            n_commission := 0.05;
+        ELSE
+            n_commission := 0;
+    END CASE;
+    return 'Commission is '||n_commission*100||'%';
+END;
+
+
+----------------------------------------------------------
+RANKING
+
+create or replace NONEDITIONABLE function asignar_ranking (
+c_grade in varchar)
+return VARCHAR2
+is
+c_rank varchar2(20);
+begin
+    case c_grade
+        when 'A' then
+            c_rank := 'Excellent';
+        when 'B' then
+            c_rank := 'Very Good';
+        when 'C' then
+            c_rank := 'Good';
+        when 'D' then
+            c_rank := 'Fair';
+        when 'F' then
+            c_rank := 'Poor';
+    else
+        c_rank := 'No such grade';
+        end case;
+    return c_rank;
+end;
+
+OBTENER INFO REGISTROS
+create or replace NONEDITIONABLE PROCEDURE obtener_informacion_registros AS
+BEGIN
+    FOR reg IN (SELECT * FROM registros) LOOP
+        DBMS_OUTPUT.PUT_LINE('Id: '|| reg.id ||', Usuario: ' || reg.usuario || ', Contraseña: ' || reg.contrasena);
+    END LOOP;
+END obtener_informacion_registros;
+
+
+----------------------------------------------------------
+OBTENER INFO REGISTROS
+
+create or replace NONEDITIONABLE PROCEDURE obtener_informacion_registros AS
+BEGIN
+    FOR reg IN (SELECT * FROM registros) LOOP
+        DBMS_OUTPUT.PUT_LINE('Id: '|| reg.id ||', Usuario: ' || reg.usuario || ', Contraseña: ' || reg.contrasena);
+    END LOOP;
+END obtener_informacion_registros;
+
+
+----------------------------------------------------------
+VALIDAR CONTRASENA
+
+
+create or replace NONEDITIONABLE FUNCTION validar_registro(
+    r_contrasena IN VARCHAR2
+) RETURN NUMBER IS
+    v_valid NUMBER := 1; -- Asumimos que es válida hasta que se demuestre lo contrario
+BEGIN 
+    -- Validar longitud
+    IF LENGTH(r_contrasena) < 13 OR LENGTH(r_contrasena) > 20 THEN
+        DBMS_OUTPUT.PUT_LINE('Longitud inválida: ' || LENGTH(r_contrasena));
+        RETURN 0; -- Retornar 0 si no está en rango
+    END IF;
+
+    -- Verificar que contenga al menos una letra minúscula
+    IF NOT REGEXP_LIKE(r_contrasena, '.*[a-z].*') THEN
+        DBMS_OUTPUT.PUT_LINE('No contiene minúscula.');
+        v_valid := 0;
+    END IF;
+
+    -- Verificar que contenga al menos una letra mayúscula
+    IF NOT REGEXP_LIKE(r_contrasena, '.*[A-Z].*') THEN
+        DBMS_OUTPUT.PUT_LINE('No contiene mayúscula.');
+        v_valid := 0;
+    END IF;
+
+    -- Verificar que contenga al menos un dígito
+    IF NOT REGEXP_LIKE(r_contrasena, '.*\d.*') THEN
+        DBMS_OUTPUT.PUT_LINE('No contiene dígito.');
+        v_valid := 0;
+    END IF;
+
+    -- Verificar que contenga al menos un carácter especial
+    IF NOT REGEXP_LIKE(r_contrasena, '.*[@\$!%*?&].*') THEN
+        DBMS_OUTPUT.PUT_LINE('No contiene carácter especial.');
+        v_valid := 0;
+    END IF;
+
+    RETURN v_valid;  -- Retornar 1 si es válida, 0 si no
+END validar_registro;
+
+
+-------------------------------------------------
+PRUEBA
+
+create or replace NONEDITIONABLE FUNCTION prueba
+RETURN VARCHAR2 IS
+    v_regex VARCHAR2(500);
+BEGIN
+
+    v_regex := 'hola prueba de funcion desde SQL';
+
+    RETURN v_regex;
+END prueba;
