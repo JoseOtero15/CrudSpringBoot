@@ -74,39 +74,34 @@ VALIDAR CONTRASENA
 create or replace NONEDITIONABLE FUNCTION validar_registro(
     r_contrasena IN VARCHAR2
 ) RETURN NUMBER IS
-    v_valid NUMBER := 1; -- Asumimos que es válida hasta que se demuestre lo contrario
-BEGIN 
+    v_valid NUMBER := 1;
+BEGIN
     -- Validar longitud
     IF LENGTH(r_contrasena) < 13 OR LENGTH(r_contrasena) > 20 THEN
-        DBMS_OUTPUT.PUT_LINE('Longitud inválida: ' || LENGTH(r_contrasena));
-        RETURN 0; -- Retornar 0 si no está en rango
+        RETURN 2;
     END IF;
 
     -- Verificar que contenga al menos una letra minúscula
     IF NOT REGEXP_LIKE(r_contrasena, '.*[a-z].*') THEN
-        DBMS_OUTPUT.PUT_LINE('No contiene minúscula.');
-        v_valid := 0;
+        return 3;
     END IF;
 
     -- Verificar que contenga al menos una letra mayúscula
     IF NOT REGEXP_LIKE(r_contrasena, '.*[A-Z].*') THEN
-        DBMS_OUTPUT.PUT_LINE('No contiene mayúscula.');
-        v_valid := 0;
+        return 4;
     END IF;
 
     -- Verificar que contenga al menos un dígito
     IF NOT REGEXP_LIKE(r_contrasena, '.*\d.*') THEN
-        DBMS_OUTPUT.PUT_LINE('No contiene dígito.');
-        v_valid := 0;
+        return 5;
     END IF;
 
     -- Verificar que contenga al menos un carácter especial
     IF NOT REGEXP_LIKE(r_contrasena, '.*[@\$!%*?&].*') THEN
-        DBMS_OUTPUT.PUT_LINE('No contiene carácter especial.');
-        v_valid := 0;
+        return 6;
     END IF;
 
-    RETURN v_valid;  -- Retornar 1 si es válida, 0 si no
+    RETURN v_valid;
 END validar_registro;
 
 
