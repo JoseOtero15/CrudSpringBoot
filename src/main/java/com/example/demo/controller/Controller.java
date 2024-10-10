@@ -27,11 +27,13 @@ public class Controller {
 
     @PostMapping("/guardar")
     public String guardarRegistro(@RequestBody Registros r){
-        if( validacionContrasena( r.getContrasena() ) ){
+        int resultCode = repo.validar_contrasena( r.getContrasena() );
+        System.out.println("r.getContrasena() = " + r.getContrasena());
+        if( resultCode == 1 ) {
             repo.save(r);
             return "Usuario Guardado";
         }
-        return "Usuario No Guardado, Contraseña No Cumple con los Requisitos";
+        return mensajeValidacionContrasena( resultCode );
     };
 
     @PutMapping("/editar/{id}")
@@ -42,11 +44,12 @@ public class Controller {
             Registros registroExistente = registro.get();
             registroExistente.setUsuario(r.getUsuario());
 
-            if ( validacionContrasena( r.getContrasena() )){
+            int resultCode = repo.validar_contrasena( r.getContrasena() );
 
+            if ( resultCode == 1 ){
                 registroExistente.setContrasena( r.getContrasena() );
             }else{
-                return "Contraseña No Cumple con los Requisitos";
+                return mensajeValidacionContrasena( resultCode );
             }
 
             repo.save(registroExistente);
@@ -68,8 +71,32 @@ public class Controller {
         }
     }
 
-    public boolean validacionContrasena(String contrasena) {
-        return repo.validar_contrasena(contrasena) == 1;
+    public String mensajeValidacionContrasena(int resultCode){
+        String mensaje;
+        switch ( resultCode ){
+            case 1:
+                mensaje = "validado";
+                break;
+            case 2:
+                mensaje = "Longitud de la contraseña invalida";
+                break;
+            case 3:
+                mensaje = "La contraseña no contiene minusculas";
+                break;
+            case 4:
+                mensaje = "La contraseña no contiene mayusculas";
+                break;
+            case 5:
+                mensaje = "No contiene al menos un digito";
+                break;
+            case 6:
+                mensaje = "No contiene al menos un caracter especial";
+                break;
+            default:
+                mensaje = "Ocurrio un error";
+                break;
+        }
+        return mensaje;
     }
 
     @GetMapping("/registros/prueba")
